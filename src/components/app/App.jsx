@@ -1,25 +1,53 @@
 import "./App.css";
-import Profile from "../profile/Profile.jsx";
-import FriendList from "../friend-list/FriendList.jsx";
-import userData from "../../data/userData.json";
-import friendData from "../../data/friendData.json";
-import transaction from "../../data/transaction.json";
-import TransactionHistory from "../transaction-history/TransactionHistory.jsx";
+import { useState, useEffect } from "react";
+import defaultContacts from "../../../contacts.json";
+import ContactForm from "../contact-form/ContactForm";
+import SearchBox from "../search-box/SearchBox";
+import ContactList from "../contact-list/ContactList";
 
-const App = () => {
-  return (
-    <>
-      <Profile
-        name={userData.username}
-        tag={userData.tag}
-        location={userData.location}
-        image={userData.avatar}
-        stats={userData.stats}
-      />
-      <FriendList friends={friendData} />
-      <TransactionHistory items={transaction} />
-    </>
+function App() {
+  const [contacts, setContacts] = useState(() => {
+    const saveContacts = window.localStorage.getItem("save-contacts");
+    if (saveContacts !== null) {
+      return JSON.parse(saveContacts);
+    } else {
+      return defaultContacts;
+    }
+  });
+
+  const [inputValue, setInputValue] = useState("");
+
+  const addContact = (newContact) => {
+    setContacts((prevContacs) => {
+      return [...prevContacs, newContact];
+    });
+  };
+
+  const deleteContact = (id) => {
+    setContacts((prevContacs) => {
+      return prevContacs.filter((contact) => contact.id !== id);
+    });
+  };
+
+  const visibleContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(inputValue.toLocaleLowerCase())
   );
-};
+
+  useEffect(() => {
+    window.localStorage.setItem("save-contacts", JSON.stringify(contacts));
+  }, [contacts]);
+
+  return (
+    <div>
+      <h1>Phonebook</h1>
+      <ContactForm addContact={addContact} />
+      <SearchBox inputValue={inputValue} handleChange={setInputValue} />
+      <ContactList
+        visibleContacts={visibleContacts}
+        deleteContact={deleteContact}
+      />
+    </div>
+  );
+}
 
 export default App;
