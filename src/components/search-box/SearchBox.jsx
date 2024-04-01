@@ -12,7 +12,7 @@ const SearchBox = ({ inputValue, handleChange }) => {
       <input
         className={css.input}
         type="text"
-        inputValue={inputValue}
+        value={inputValue}
         id={searchId}
         onChange={(evt) => handleChange(evt.target.value)}
       />
